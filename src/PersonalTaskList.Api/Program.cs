@@ -9,8 +9,6 @@ builder.Services.AddDbContext<TaskDbContext>(options =>
 
 var app = builder.Build();
 
-app.MapGet("/", () => Results.Ok("Personal Task List API"));
-
 app.MapGet("/api/tasks", async (TaskDbContext dbContext) =>
 {
     var tasks = await dbContext.Tasks

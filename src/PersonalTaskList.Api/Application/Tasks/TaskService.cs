@@ -2,74 +2,85 @@ using PersonalTaskList.Api.Domain.Tasks;
 
 namespace PersonalTaskList.Api.Application.Tasks;
 
-public class TaskService(ITaskRepository taskRepository)
+public class TaskService : ITaskService
 {
-    public async Task<IReadOnlyList<TaskDto>> ListAsync(CancellationToken cancellationToken)
-    {
-        var tasks = await taskRepository.ListAsync(cancellationToken);
+    private readonly ITaskRepository _taskRepository;
 
-        return tasks
-            .Select(TaskDto.FromTask)
-            .ToList();
+    public TaskService(ITaskRepository taskRepository)
+    {
+        _taskRepository = taskRepository;
     }
 
-    public async Task<TaskDto> CreateAsync(
+    public async Task<IReadOnlyList<TaskItem>> ListAsync(CancellationToken cancellationToken)
+    {
+        return await _taskRepository.ListAsync(cancellationToken);
+    }
+
+    public async Task<TaskItem> CreateAsync(
         string title,
         string? description,
         CancellationToken cancellationToken)
     {
         var now = DateTimeOffset.UtcNow;
-        var task = TaskItem.Create(Guid.NewGuid(), title, description, now);
+        var taskEntity = FromTaskInputToEntity(title, description, now);
 
-        await taskRepository.AddAsync(task, cancellationToken);
-        await taskRepository.SaveChangesAsync(cancellationToken);
+        await _taskRepository.AddAsync(taskEntity, cancellationToken);
+        await _taskRepository.SaveChangesAsync(cancellationToken);
 
-        return TaskDto.FromTask(task);
+        return taskEntity;
     }
 
-    public async Task<TaskDto?> UpdateAsync(
+    public async Task<TaskItem?> UpdateAsync(
         Guid id,
         string title,
         string? description,
         CancellationToken cancellationToken)
     {
-        var task = await taskRepository.FindByIdAsync(id, cancellationToken);
+        var task = await _taskRepository.FindByIdAsync(id, cancellationToken);
         if (task is null)
         {
             return null;
         }
 
         task.UpdateDetails(title, description, DateTimeOffset.UtcNow);
-        await taskRepository.SaveChangesAsync(cancellationToken);
+        await _taskRepository.SaveChangesAsync(cancellationToken);
 
-        return TaskDto.FromTask(task);
+        return task;
     }
 
-    public async Task<TaskDto?> CompleteAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<TaskItem?> CompleteAsync(Guid id, CancellationToken cancellationToken)
     {
-        var task = await taskRepository.FindByIdAsync(id, cancellationToken);
+        var task = await _taskRepository.FindByIdAsync(id, cancellationToken);
         if (task is null)
         {
             return null;
         }
 
         task.Complete(DateTimeOffset.UtcNow);
-        await taskRepository.SaveChangesAsync(cancellationToken);
+        await _taskRepository.SaveChangesAsync(cancellationToken);
 
-        return TaskDto.FromTask(task);
+        return task;
     }
 
     public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken)
     {
-        var task = await taskRepository.FindByIdAsync(id, cancellationToken);
+        var task = await _taskRepository.FindByIdAsync(id, cancellationToken);
         if (task is null)
         {
             return false;
         }
 
-        taskRepository.Remove(task);
-        await taskRepository.SaveChangesAsync(cancellationToken);
+        _taskRepository.Remove(task);
+        await _taskRepository.SaveChangesAsync(cancellationToken);
 
         return true;
+    }
+
+    private static TaskItem FromTaskInputToEntity(
+        string title,
+        string? description,
+        DateTimeOffset createdAt)
+    {
+        return TaskItem.Create(Guid.NewGuid(), title, description, createdAt);
     }
 }

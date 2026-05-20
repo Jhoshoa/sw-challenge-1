@@ -1,5 +1,5 @@
 using FluentValidation;
-using PersonalTaskList.Api.Presentation.Contracts;
+using PersonalTaskList.Api.Presentation.Dtos;
 
 namespace PersonalTaskList.Api.Presentation.Validation;
 

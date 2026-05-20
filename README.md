@@ -24,7 +24,7 @@ src/
     Domain/                 Task aggregate and repository port
     Application/            Task service and application DTOs
     Infrastructure/         EF Core persistence adapter, DbContext, and migrations
-    Presentation/           MVC controllers, HTTP contracts, and validators
+    Presentation/           MVC controllers, HTTP DTOs, and validators
 tests/
   PersonalTaskList.Api.Tests/
 ```

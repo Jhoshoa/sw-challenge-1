@@ -20,7 +20,7 @@ public class PersistenceModelTests
     }
 
     [Fact]
-    public void TaskEntityMapsToTasksTableWithDocumentedColumns()
+    public void TaskEntityMapsUsingEntityFrameworkConventions()
     {
         using var connection = new SqliteConnection("Data Source=:memory:");
         var options = new DbContextOptionsBuilder<TaskDbContext>()
@@ -31,7 +31,7 @@ public class PersistenceModelTests
         var entityType = dbContext.Model.FindEntityType(typeof(Api.Domain.Tasks.TaskItem));
 
         Assert.NotNull(entityType);
-        Assert.Equal("tasks", entityType.GetTableName());
+        Assert.Equal("Tasks", entityType.GetTableName());
 
         var columnNames = entityType
             .GetProperties()
@@ -40,13 +40,13 @@ public class PersistenceModelTests
 
         Assert.True(columnNames.SetEquals(
         [
-            "id",
-            "title",
-            "description",
-            "isCompleted",
-            "createdAt",
-            "updatedAt",
-            "completedAt"
+            "Id",
+            "Title",
+            "Description",
+            "IsCompleted",
+            "CreatedAt",
+            "UpdatedAt",
+            "CompletedAt"
         ]));
     }
 }

@@ -12,20 +12,20 @@ namespace PersonalTaskList.Api.Infrastructure.Persistence.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "tasks",
+                name: "Tasks",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    title = table.Column<string>(type: "TEXT", nullable: false),
-                    description = table.Column<string>(type: "TEXT", nullable: true),
-                    isCompleted = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: false),
-                    createdAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    updatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    completedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: true)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Title = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: true),
+                    IsCompleted = table.Column<bool>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    CompletedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_tasks", x => x.id);
+                    table.PrimaryKey("PK_Tasks", x => x.Id);
                 });
         }
 
@@ -33,7 +33,7 @@ namespace PersonalTaskList.Api.Infrastructure.Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "tasks");
+                name: "Tasks");
         }
     }
 }

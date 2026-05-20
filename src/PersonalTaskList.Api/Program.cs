@@ -50,6 +50,32 @@ app.MapPost("/api/tasks", async (CreateTaskRequest request, TaskDbContext dbCont
     return Results.Created("/api/tasks", TaskResponse.FromTask(task));
 });
 
+app.MapPut("/api/tasks/{id:guid}", async (Guid id, UpdateTaskRequest request, TaskDbContext dbContext) =>
+{
+    if (string.IsNullOrWhiteSpace(request.Title))
+    {
+        return Results.ValidationProblem(new Dictionary<string, string[]>
+        {
+            [nameof(request.Title)] = ["Title is required."]
+        });
+    }
+
+    var task = await dbContext.Tasks.FindAsync(id);
+
+    if (task is null)
+    {
+        return Results.NotFound();
+    }
+
+    task.Title = request.Title.Trim();
+    task.Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description;
+    task.UpdatedAt = DateTimeOffset.UtcNow;
+
+    await dbContext.SaveChangesAsync();
+
+    return Results.Ok(TaskResponse.FromTask(task));
+});
+
 app.Run();
 
 public partial class Program;

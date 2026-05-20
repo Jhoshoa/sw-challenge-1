@@ -76,6 +76,28 @@ app.MapPut("/api/tasks/{id:guid}", async (Guid id, UpdateTaskRequest request, Ta
     return Results.Ok(TaskResponse.FromTask(task));
 });
 
+app.MapPatch("/api/tasks/{id:guid}/complete", async (Guid id, TaskDbContext dbContext) =>
+{
+    var task = await dbContext.Tasks.FindAsync(id);
+
+    if (task is null)
+    {
+        return Results.NotFound();
+    }
+
+    if (!task.IsCompleted)
+    {
+        var now = DateTimeOffset.UtcNow;
+        task.IsCompleted = true;
+        task.CompletedAt = now;
+        task.UpdatedAt = now;
+
+        await dbContext.SaveChangesAsync();
+    }
+
+    return Results.Ok(TaskResponse.FromTask(task));
+});
+
 app.Run();
 
 public partial class Program;

@@ -2,8 +2,9 @@ using System.Net;
 using System.Net.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PersonalTaskList.Api.Contracts;
-using PersonalTaskList.Api.Data;
+using PersonalTaskList.Api.Presentation.Contracts;
+using PersonalTaskList.Api.Domain.Tasks;
+using PersonalTaskList.Api.Infrastructure.Persistence;
 
 namespace PersonalTaskList.Api.Tests;
 
@@ -19,14 +20,7 @@ public class TaskCompleteEndpointTests
         using (var scope = factory.Services.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<TaskDbContext>();
-            dbContext.Tasks.Add(new Api.Models.Task
-            {
-                Id = taskId,
-                Title = "Incomplete task",
-                Description = null,
-                CreatedAt = createdAt,
-                UpdatedAt = createdAt
-            });
+            dbContext.Tasks.Add(TaskItem.Create(taskId, "Incomplete task", null, createdAt));
 
             await dbContext.SaveChangesAsync();
         }
@@ -62,16 +56,9 @@ public class TaskCompleteEndpointTests
         using (var scope = factory.Services.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<TaskDbContext>();
-            dbContext.Tasks.Add(new Api.Models.Task
-            {
-                Id = taskId,
-                Title = "Completed task",
-                Description = null,
-                IsCompleted = true,
-                CreatedAt = createdAt,
-                UpdatedAt = completedAt,
-                CompletedAt = completedAt
-            });
+            var task = TaskItem.Create(taskId, "Completed task", null, createdAt);
+            task.Complete(completedAt);
+            dbContext.Tasks.Add(task);
 
             await dbContext.SaveChangesAsync();
         }

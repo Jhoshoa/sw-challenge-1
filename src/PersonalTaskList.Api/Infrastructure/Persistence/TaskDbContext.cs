@@ -1,14 +1,15 @@
 using Microsoft.EntityFrameworkCore;
+using PersonalTaskList.Api.Domain.Tasks;
 
-namespace PersonalTaskList.Api.Data;
+namespace PersonalTaskList.Api.Infrastructure.Persistence;
 
 public class TaskDbContext(DbContextOptions<TaskDbContext> options) : DbContext(options)
 {
-    public DbSet<Models.Task> Tasks => Set<Models.Task>();
+    public DbSet<TaskItem> Tasks => Set<TaskItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Models.Task>(entity =>
+        modelBuilder.Entity<TaskItem>(entity =>
         {
             entity.ToTable("tasks");
 

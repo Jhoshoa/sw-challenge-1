@@ -9,7 +9,7 @@ public class OpenApiContractTests
     {
         var repositoryRoot = FindRepositoryRoot();
         var openApiEndpoints = ReadOpenApiEndpoints(Path.Combine(repositoryRoot, "docs", "openapi.yaml"));
-        var implementedEndpoints = ReadImplementedEndpoints(Path.Combine(repositoryRoot, "src", "PersonalTaskList.Api", "Program.cs"));
+        var implementedEndpoints = ReadImplementedEndpoints(Path.Combine(repositoryRoot, "src", "PersonalTaskList.Api"));
 
         Assert.Equal(openApiEndpoints.Order(), implementedEndpoints.Order());
     }
@@ -66,19 +66,46 @@ public class OpenApiContractTests
         return endpoints;
     }
 
-    private static HashSet<string> ReadImplementedEndpoints(string path)
+    private static HashSet<string> ReadImplementedEndpoints(string sourceDirectory)
     {
-        var source = File.ReadAllText(path);
-        var matches = Regex.Matches(source, @"app\.Map(Get|Post|Put|Patch|Delete)\(""([^""]+)""");
+        var endpoints = new HashSet<string>(StringComparer.Ordinal);
 
-        return matches
-            .Select(match =>
+        foreach (var file in Directory.EnumerateFiles(sourceDirectory, "*.cs", SearchOption.AllDirectories))
+        {
+            var source = File.ReadAllText(file);
+            var controllerRoute = Regex.Match(source, @"\[Route\(""([^""]+)""\)\]");
+            if (!controllerRoute.Success)
+            {
+                continue;
+            }
+
+            var baseRoute = "/" + controllerRoute.Groups[1].Value.Trim('/');
+            var matches = Regex.Matches(
+                source,
+                @"\[Http(Get|Post|Put|Patch|Delete)(?:\(""([^""]*)""\))?\]");
+
+            foreach (Match match in matches)
             {
                 var method = match.Groups[1].Value.ToUpperInvariant();
-                var route = match.Groups[2].Value.Replace("{id:guid}", "{id}", StringComparison.Ordinal);
-                return $"{method} {route}";
-            })
-            .ToHashSet(StringComparer.Ordinal);
+                var routeTemplate = match.Groups[2].Success ? match.Groups[2].Value : string.Empty;
+                var route = CombineRoutes(baseRoute, routeTemplate)
+                    .Replace("{id:guid}", "{id}", StringComparison.Ordinal);
+
+                endpoints.Add($"{method} {route}");
+            }
+        }
+
+        return endpoints;
+    }
+
+    private static string CombineRoutes(string baseRoute, string routeTemplate)
+    {
+        if (string.IsNullOrWhiteSpace(routeTemplate))
+        {
+            return baseRoute;
+        }
+
+        return $"{baseRoute}/{routeTemplate.Trim('/')}";
     }
 
     private static string FindRepositoryRoot()

@@ -2,8 +2,8 @@ using System.Net;
 using System.Net.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PersonalTaskList.Api.Contracts;
-using PersonalTaskList.Api.Data;
+using PersonalTaskList.Api.Presentation.Contracts;
+using PersonalTaskList.Api.Infrastructure.Persistence;
 
 namespace PersonalTaskList.Api.Tests;
 

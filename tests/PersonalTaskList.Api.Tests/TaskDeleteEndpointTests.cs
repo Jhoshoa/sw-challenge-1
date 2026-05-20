@@ -1,7 +1,8 @@
 using System.Net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PersonalTaskList.Api.Data;
+using PersonalTaskList.Api.Domain.Tasks;
+using PersonalTaskList.Api.Infrastructure.Persistence;
 
 namespace PersonalTaskList.Api.Tests;
 
@@ -17,14 +18,7 @@ public class TaskDeleteEndpointTests
         using (var scope = factory.Services.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<TaskDbContext>();
-            dbContext.Tasks.Add(new Api.Models.Task
-            {
-                Id = taskId,
-                Title = "Delete me",
-                Description = null,
-                CreatedAt = now,
-                UpdatedAt = now
-            });
+            dbContext.Tasks.Add(TaskItem.Create(taskId, "Delete me", null, now));
 
             await dbContext.SaveChangesAsync();
         }

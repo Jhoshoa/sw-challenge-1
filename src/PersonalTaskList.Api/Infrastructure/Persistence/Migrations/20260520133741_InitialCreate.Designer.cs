@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using PersonalTaskList.Api.Data;
+using PersonalTaskList.Api.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace PersonalTaskList.Api.Data.Migrations
+namespace PersonalTaskList.Api.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(TaskDbContext))]
     [Migration("20260520133741_InitialCreate")]
@@ -20,7 +20,7 @@ namespace PersonalTaskList.Api.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.27");
 
-            modelBuilder.Entity("PersonalTaskList.Api.Models.Task", b =>
+            modelBuilder.Entity("PersonalTaskList.Api.Domain.Tasks.TaskItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT")

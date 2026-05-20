@@ -1,6 +1,6 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using PersonalTaskList.Api.Data;
+using PersonalTaskList.Api.Infrastructure.Persistence;
 
 namespace PersonalTaskList.Api.Tests;
 
@@ -28,7 +28,7 @@ public class PersistenceModelTests
             .Options;
 
         using var dbContext = new TaskDbContext(options);
-        var entityType = dbContext.Model.FindEntityType(typeof(Api.Models.Task));
+        var entityType = dbContext.Model.FindEntityType(typeof(Api.Domain.Tasks.TaskItem));
 
         Assert.NotNull(entityType);
         Assert.Equal("tasks", entityType.GetTableName());

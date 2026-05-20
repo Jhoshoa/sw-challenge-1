@@ -1,8 +1,9 @@
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
-using PersonalTaskList.Api.Contracts;
-using PersonalTaskList.Api.Data;
+using PersonalTaskList.Api.Presentation.Contracts;
+using PersonalTaskList.Api.Domain.Tasks;
+using PersonalTaskList.Api.Infrastructure.Persistence;
 
 namespace PersonalTaskList.Api.Tests;
 
@@ -37,25 +38,11 @@ public class TaskListEndpointTests
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<TaskDbContext>();
 
-            dbContext.Tasks.AddRange(
-                new Api.Models.Task
-                {
-                    Id = firstTaskId,
-                    Title = "First task",
-                    Description = "First description",
-                    CreatedAt = now,
-                    UpdatedAt = now
-                },
-                new Api.Models.Task
-                {
-                    Id = secondTaskId,
-                    Title = "Second task",
-                    Description = null,
-                    IsCompleted = true,
-                    CreatedAt = now.AddMinutes(1),
-                    UpdatedAt = now.AddMinutes(2),
-                    CompletedAt = now.AddMinutes(2)
-                });
+            var firstTask = TaskItem.Create(firstTaskId, "First task", "First description", now);
+            var secondTask = TaskItem.Create(secondTaskId, "Second task", null, now.AddMinutes(1));
+            secondTask.Complete(now.AddMinutes(2));
+
+            dbContext.Tasks.AddRange(firstTask, secondTask);
 
             await dbContext.SaveChangesAsync();
         }

@@ -1,6 +1,8 @@
-namespace PersonalTaskList.Api.Contracts;
+using PersonalTaskList.Api.Domain.Tasks;
 
-public sealed record TaskResponse(
+namespace PersonalTaskList.Api.Application.Tasks;
+
+public sealed record TaskDto(
     Guid Id,
     string Title,
     string? Description,
@@ -9,9 +11,9 @@ public sealed record TaskResponse(
     DateTimeOffset UpdatedAt,
     DateTimeOffset? CompletedAt)
 {
-    public static TaskResponse FromTask(Models.Task task)
+    public static TaskDto FromTask(TaskItem task)
     {
-        return new TaskResponse(
+        return new TaskDto(
             task.Id,
             task.Title,
             task.Description,

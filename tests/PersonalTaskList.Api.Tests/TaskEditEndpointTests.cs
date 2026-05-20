@@ -2,8 +2,9 @@ using System.Net;
 using System.Net.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PersonalTaskList.Api.Contracts;
-using PersonalTaskList.Api.Data;
+using PersonalTaskList.Api.Presentation.Contracts;
+using PersonalTaskList.Api.Domain.Tasks;
+using PersonalTaskList.Api.Infrastructure.Persistence;
 
 namespace PersonalTaskList.Api.Tests;
 
@@ -19,14 +20,7 @@ public class TaskEditEndpointTests
         using (var scope = factory.Services.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<TaskDbContext>();
-            dbContext.Tasks.Add(new Api.Models.Task
-            {
-                Id = taskId,
-                Title = "Buy groceries",
-                Description = "Milk, eggs, bread",
-                CreatedAt = createdAt,
-                UpdatedAt = createdAt
-            });
+            dbContext.Tasks.Add(TaskItem.Create(taskId, "Buy groceries", "Milk, eggs, bread", createdAt));
 
             await dbContext.SaveChangesAsync();
         }
@@ -81,14 +75,7 @@ public class TaskEditEndpointTests
         using (var scope = factory.Services.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<TaskDbContext>();
-            dbContext.Tasks.Add(new Api.Models.Task
-            {
-                Id = taskId,
-                Title = "Original title",
-                Description = "Original description",
-                CreatedAt = createdAt,
-                UpdatedAt = createdAt
-            });
+            dbContext.Tasks.Add(TaskItem.Create(taskId, "Original title", "Original description", createdAt));
 
             await dbContext.SaveChangesAsync();
         }

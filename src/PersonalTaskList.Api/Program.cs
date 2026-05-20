@@ -98,6 +98,21 @@ app.MapPatch("/api/tasks/{id:guid}/complete", async (Guid id, TaskDbContext dbCo
     return Results.Ok(TaskResponse.FromTask(task));
 });
 
+app.MapDelete("/api/tasks/{id:guid}", async (Guid id, TaskDbContext dbContext) =>
+{
+    var task = await dbContext.Tasks.FindAsync(id);
+
+    if (task is null)
+    {
+        return Results.NotFound();
+    }
+
+    dbContext.Tasks.Remove(task);
+    await dbContext.SaveChangesAsync();
+
+    return Results.NoContent();
+});
+
 app.Run();
 
 public partial class Program;

@@ -11,6 +11,17 @@ var app = builder.Build();
 
 app.MapGet("/", () => Results.Ok("Personal Task List API"));
 
+app.MapGet("/api/tasks", async (TaskDbContext dbContext) =>
+{
+    var tasks = await dbContext.Tasks
+        .AsNoTracking()
+        .OrderBy(task => task.Id)
+        .Select(task => TaskResponse.FromTask(task))
+        .ToListAsync();
+
+    return Results.Ok(tasks);
+});
+
 app.MapPost("/api/tasks", async (CreateTaskRequest request, TaskDbContext dbContext) =>
 {
     if (string.IsNullOrWhiteSpace(request.Title))
